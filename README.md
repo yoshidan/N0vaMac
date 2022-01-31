@@ -8,6 +8,12 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 * WindowsとAndroidしかサポートしていない[N0va Desktop](https://n0vadp.mihoyo.com/)の一部ライブ背景をMacのデスクトップ背景として使えるようにします。
 * 現在利用できるのは原神のパーツアニメにより作成されている背景のみです。Lumi、他のゲーム、原神でもゲーム内3Dを動画した音声付きのものは対応していません。
 
+## 動作環境
+* MacBookPro Intel macOS Catalina 10.15
+* MacBookPro Intel macOS Mojave 10.14
+
+当方M1 Mac未所持のため現状未検証です。
+
 ## ダウンロード
 [こちらから](https://github.com/yoshidan/N0vaMac/releases)最新版のN0vaMac.zipをダウンロードして開いてください。解凍すると以下の二つのアプリがあります。
 * N0vaMac
