@@ -5,7 +5,7 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 
 
 ## できること
-* WindowsとAndroidしかサポートしていない[N0va Desktop]((https://n0vadp.mihoyo.com/)の一部ライブ背景をMacのデスクトップ背景として使えるようにします。
+* WindowsとAndroidしかサポートしていない[N0va Desktop](https://n0vadp.mihoyo.com/)の一部ライブ背景をMacのデスクトップ背景として使えるようにします。
 * 現在利用できるのは原神のパーツアニメにより作成されている背景のみです。Lumi、他のゲーム、原神でもゲーム内3Dを動画した音声付きのものは対応していません。
 
 ## ダウンロード
@@ -19,8 +19,10 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 * N0vaMacを起動してください。デフォルトで背景に動く胡桃が画面全隊の背景に表示されればOKです。
 * Dockに珊瑚宮心海が表示されます。
   - 右クリックして「オプション」→ 「全てのデスクトップ」を選択してください。全デスクトップの背景に適用されます。
-* 「ログイン時に開く」を選択しておくと、再起動時に自動的にアプリケーションを起動します。
-* 起動中でもDockからアイコンを非表示にしたい場合は`N0vaMac.app/Content/Info.plist`を開いて、<dict>タグ内に以下の記述を追加して再起動してください。なおこの記述追加後は、アプリを停止するためにはActivty Monitor等からタスクキルが必要になります。
+  - 「ログイン時に開く」を選択しておくと、再起動時に自動的にアプリケーションを起動します。
+  <img src="./images/setting.jpg" width="320"/>
+
+* 起動中でもDockからアイコンを非表示にしたい場合は、`N0vaMac.app/Content/Info.plist`を開いて、<dict>タグ内に以下の記述を追加して再起動してください。なおこの記述追加後は、アプリを停止するためにはActivty Monitor等からタスクキルが必要になります。
   ```
   <key>LSUIElement</key>
   <true/>
@@ -31,6 +33,8 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 * 完了したらDownloadの表記がSelectに変わります。Selectを選択すると背景が切り替わります。
 * N0vaMacSettingは背景変更する時だけ起動しておけばいいです。常時起動しておく必要はありません。
 
+https://user-images.githubusercontent.com/958174/151774833-051e6864-429e-45cb-9072-f6228979aa06.mov
+  
 ## その他
 * デスクトップを追加した場合、一度Dockのアイコンを選択すると追加したデスクトップにも反映されます。
 * 外付けデスクトップによる拡張は対応していません。拡張先には背景が適用されないです。ミラーリングは解像度が同じであれば問題ありません。
