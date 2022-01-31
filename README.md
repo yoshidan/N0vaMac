@@ -9,11 +9,11 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 * 現在利用できるのは原神のパーツアニメにより作成されている背景のみです。Lumi、他のゲーム、原神でもゲーム内3Dを動画した音声付きのものは対応していません。
 
 ## ダウンロード
-[最新のリリースパッケージ](./released/latest)をダウンロードして開いてください。以下の二つのファイルがあります。
+[こちらから](https://github.com/yoshidan/N0vaMac/releases)最新版のN0vaMac.zipをダウンロードして開いてください。解凍すると以下の二つのアプリがあります。
 * N0vaMac
-  - N0va Desktopの動画を壁紙にするツールです。
+  - 動画を壁紙にするツールです。
 * N0vaMacSetting 
-  - ダウンロードしたり壁紙を変更するためのツールです。
+  - N0vaDesktopのライブ壁紙をダウンロードしたり壁紙を変更するためのツールです。
 
 ## N0vaMacの使い方
 * N0vaMacを起動してください。デフォルトで背景に動く胡桃が画面全隊の背景に表示されればOKです。
@@ -21,12 +21,6 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
   - 右クリックして「オプション」→ 「全てのデスクトップ」を選択してください。全デスクトップの背景に適用されます。
   - 「ログイン時に開く」を選択しておくと、再起動時に自動的にアプリケーションを起動します。
   <img src="./images/setting.jpg" width="320"/>
-
-* 起動中でもDockからアイコンを非表示にしたい場合は、`N0vaMac.app/Content/Info.plist`を開いて、<dict>タグ内に以下の記述を追加して再起動してください。なおこの記述追加後は、アプリを停止するためにはActivty Monitor等からタスクキルが必要になります。
-  ```
-  <key>LSUIElement</key>
-  <true/>
-  ```
 
 ## N0vaMacSettingの使い方
 * N0vaMacSettingを起動したら、背景設定したい動画のサムネイルのDownloadボタンを押してください。
