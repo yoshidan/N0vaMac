@@ -12,7 +12,7 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 * MacBookPro Intel macOS Catalina 10.15
 * MacBookPro Intel macOS Mojave 10.14
 
-当方M1 Mac未所持のため現状未検証です。
+M1 Macは当方未所持のため未検証です。
 
 ## ダウンロード
 [こちらから](https://github.com/yoshidan/N0vaMac/releases)最新版のN0vaMac.zipをダウンロードして開いてください。解凍すると以下の二つのアプリがあります。
