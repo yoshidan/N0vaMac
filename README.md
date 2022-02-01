@@ -18,7 +18,7 @@ M1 Macは当方未所持のため未検証です。
 [こちらから](https://github.com/yoshidan/N0vaMac/releases)最新版のN0vaMac.zipをダウンロードして開いてください。解凍すると以下の二つのアプリがあります。
 * N0vaMac
   - 動画を壁紙にするツールです。
-* N0vaMacSetting 
+* N0vaMacConfig 
   - N0vaDesktopのライブ壁紙をダウンロードしたり壁紙を変更するためのツールです。
 
 ## N0vaMacの使い方
@@ -28,15 +28,15 @@ M1 Macは当方未所持のため未検証です。
   - 「ログイン時に開く」を選択しておくと、再起動時に自動的にアプリケーションを起動します。
   <img src="./images/setting.jpg" width="320"/>
 
-## N0vaMacSettingの使い方
-* N0vaMacSettingを起動したら、背景設定したい動画のサムネイルのDownloadボタンを押してください。
+## N0vaMacConfig
+* N0vaMacConfigを起動したら、背景設定したい動画のサムネイルのDownloadボタンを押してください。
 * 完了したらDownloadの表記がSelectに変わります。Selectを選択すると背景が切り替わります。
-* N0vaMacSettingは背景変更する時だけ起動しておけばいいです。常時起動しておく必要はありません。
+* N0vaMacConfigは背景変更する時だけ起動しておけばいいです。常時起動しておく必要はありません。
 
 https://user-images.githubusercontent.com/958174/151774833-051e6864-429e-45cb-9072-f6228979aa06.mov
   
 ## その他
 * デスクトップを追加した場合、一度Dockのアイコンを選択すると追加したデスクトップにも反映されます。
 * 外付けデスクトップによる拡張は対応していません。拡張先には背景が適用されないです。ミラーリングは解像度が同じであれば問題ありません。
-* N0vaMacSettingでSelectしても反映されない場合、localhost:9025が他のプロセスに使われている可能性があります。
+* N0vaMacConfigでSelectしても反映されない場合、localhost:9025が他のプロセスに使われている可能性があります。
   - 頻繁に発生するようでしたらissue立ててください。ポート変更できるようにします。 
