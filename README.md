@@ -6,7 +6,8 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 
 ## できること
 * WindowsとAndroidしかサポートしていない[N0va Desktop](https://n0vadp.mihoyo.com/)の一部ライブ背景をMacのデスクトップ背景として使えるようにします。
-* 現在利用できるのは原神のパーツアニメにより作成されている背景のみです。Lumi、他のゲーム、原神でもゲーム内3Dを動画した音声付きのものは対応していません。
+* 現在利用できるのは原神の一部ライブ壁紙です。Lumi、他のゲームは対応していません。
+* 音声は再生しません。
 
 ## 動作環境
 * MacBookPro Intel macOS Catalina 10.15
@@ -30,10 +31,11 @@ M1 Macは当方未所持のため未検証です。
 
 ## N0vaMacConfig
 * N0vaMacConfigを起動したら、背景設定したい動画のサムネイルのDownloadボタンを押してください。
+  - ファイルサイズが大きい場合は分割してダウンロードします。「Downloading...(6/6)」などとなってからさらに数十秒かかるので少しお待ちください。
 * 完了したらDownloadの表記がSelectに変わります。Selectを選択すると背景が切り替わります。
 * N0vaMacConfigは背景変更する時だけ起動しておけばいいです。常時起動しておく必要はありません。
 
-https://user-images.githubusercontent.com/958174/151774833-051e6864-429e-45cb-9072-f6228979aa06.mov
+https://user-images.githubusercontent.com/958174/152636903-302dd443-9947-47b2-b0de-01dee598f5b0.mov
   
 ## その他
 * デスクトップを追加した場合、一度Dockのアイコンを選択すると追加したデスクトップにも反映されます。
