@@ -12,11 +12,17 @@ using UnityEngine.UI;
 public class ListController : MonoBehaviour
 {
 
+    struct Metadata
+    {
+        public string dataName;
+        public int chunkCount; 
+    }
+
     private string baseUrl = Encoding.UTF8.GetString(Convert.FromBase64String("aHR0cHM6Ly95b3NoaWRhbi5naXRodWIuaW8vc2F2ZWRhdGEv"));
 
     private string dataDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-    private IDictionary<string, string> pairs = new Dictionary<string, string>();
+    private IDictionary<string, Metadata> pairs = new Dictionary<string, Metadata>();
 
     [SerializeField] private RectTransform content;
 
@@ -29,7 +35,7 @@ public class ListController : MonoBehaviour
     
     void Start()
     {
-        StartCoroutine(PrepareList($"{baseUrl}mapping.txt"));
+        StartCoroutine(PrepareList($"{baseUrl}mapping_v2.txt"));
     }
 
     IEnumerator PrepareList(string mappingPath)
@@ -48,8 +54,13 @@ public class ListController : MonoBehaviour
                     continue;
                 }
                 var key = keyValue[0];
-                var value = keyValue[1];
-                pairs.Add(key, value);
+                var metadata = new Metadata
+                {
+                    dataName = keyValue[1],
+                    chunkCount =  keyValue.Length > 2 ? Int32.Parse(keyValue[2]) : 0
+                };
+                
+                pairs.Add(key, metadata);
             }
         }
         else
@@ -73,7 +84,8 @@ public class ListController : MonoBehaviour
             var button = icon.GetComponentInChildren<Button>();
             StartCoroutine(LoadTexture(icon.GetComponent<RawImage>(), pair.Key, button));
 
-            var video = $"{dataDir}/{pair.Value}.mp4";
+            var video = $"{dataDir}/{pair.Value.dataName}.mp4";
+            var chunkCount = pair.Value.chunkCount;
             var text = button.GetComponentInChildren<Text>();
             text.text = File.Exists(video) ? "Select" : "Download";
             button.onClick.AddListener(() =>
@@ -85,36 +97,78 @@ public class ListController : MonoBehaviour
                 }
                 else
                 {
-                    StartCoroutine(DownloadVideo($"{baseUrl}game/{pair.Value}.ndf", video,
-                        button, text));
+                    StartCoroutine(DownloadVideo($"{baseUrl}game/{pair.Value.dataName}.ndf", video,
+                        chunkCount, button, text));
                 }
             });
         }
     }
 
-    IEnumerator DownloadVideo(string url, string path, Button button, Text text)
+    IEnumerator DownloadVideo(string url, string path, int chunkCount, Button button, Text text)
     {
         button.enabled = false;
-        text.text = "Downloading...";
-        Debug.Log($"download from {url}");
-        var request = new UnityWebRequest(url);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        yield return request.SendWebRequest();
-        if (request.result == UnityWebRequest.Result.Success)
+        Boolean hasError = false;
+        if (chunkCount > 0)
         {
-            var original = request.downloadHandler.data;
-            // I discovered that ndf is mp4 but first 2 bytes cause collapse. 
-            var mp4 = original.Skip(2).ToArray();
-            File.WriteAllBytes($"{path}_tmp", mp4);
-            File.Move($"{path}_tmp", path);
-            text.text = "Select";
-            Debug.Log($"saved into {path}");
-            button.enabled = true;
+            var data = Array.Empty<byte>().AsEnumerable();
+            for (var i = 1; i <= chunkCount; i++)
+            {
+                text.text = $"Downloading... {i}/{chunkCount}";
+                var chunkURL = $"{url}_chunk{i}";
+                Debug.Log($"download from {chunkURL}");
+                var request = new UnityWebRequest(chunkURL);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                yield return request.SendWebRequest();
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                   data  = data.Concat(request.downloadHandler.data);
+                }
+                else
+                {
+                    Debug.LogError($"download failed {request.error}");
+                    hasError = true;
+                    break;
+                }
+            }
+            if (!hasError)
+            {
+                //TODO async write
+                File.WriteAllBytes($"{path}_tmp", data.Skip(2).ToArray());
+                File.Move($"{path}_tmp", path);
+                Debug.Log($"saved into {path}");
+            }
         }
         else
         {
-            Debug.LogError($"download failed {request.error}");
+            text.text = "Downloading...";
+            Debug.Log($"download from {url}");
+            var request = new UnityWebRequest(url);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                var original = request.downloadHandler.data;
+                // I discovered that ndf is mp4 but first 2 bytes cause collapse. 
+                var mp4 = original.Skip(2).ToArray();
+                File.WriteAllBytes($"{path}_tmp", mp4);
+                File.Move($"{path}_tmp", path);
+                Debug.Log($"saved into {path}");
+            }
+            else
+            {
+                Debug.LogError($"download failed {request.error}");
+                hasError = true;
+            } 
+        }
+
+        if (hasError)
+        {
             text.text = "Error";
+        }
+        else
+        {
+            button.enabled = true;
+            text.text = "Select";
         }
     }
 
