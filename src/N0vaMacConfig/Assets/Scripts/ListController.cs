@@ -39,8 +39,7 @@ public class ListController : MonoBehaviour
     async UniTask<IDictionary<string, Metadata>> DownloadList(string mappingPath)
     {
         var pairs = new Dictionary<string, Metadata>();
-        var mappingInfo = (await UnityWebRequest.Get(mappingPath).SendWebRequest()
-                .WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler.text;
+        var mappingInfo = (await GetAsync(mappingPath)).text;
         foreach (var s in mappingInfo.Split('\n'))
         {
             var keyValue = s.Split('=');
@@ -122,7 +121,7 @@ public class ListController : MonoBehaviour
                     button.enabled = true;
                 }
             }
-            catch (OperationCanceledException oce)
+            catch (OperationCanceledException)
             {
                 //ignore console error
             }
@@ -140,8 +139,7 @@ public class ListController : MonoBehaviour
                     text.text = $"Downloading... {i}/{chunkCount}";
                     var chunkURL = $"{url}_chunk{i}";
                     Debug.Log($"download from {chunkURL}");
-                    var data = (await UnityWebRequest.Get(chunkURL).SendWebRequest()
-                        .WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler.data;
+                    var data = (await GetAsync(chunkURL)).data;
                     var offset = i == 1 ? 2 :0 ;
                     await writer.WriteAsync(data, offset, data.Length - offset);
                 }
@@ -153,7 +151,7 @@ public class ListController : MonoBehaviour
         {
             text.text = "Downloading...";
             Debug.Log($"download from {url}");
-            var data = (await UnityWebRequest.Get(url).SendWebRequest().WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler.data;
+            var data = (await GetAsync(url)).data;
             using (var writer = File.OpenWrite($"{path}_tmp"))
             {
                 // I discovered that ndf is mp4 but first 2 bytes cause collapse. 
@@ -175,9 +173,18 @@ public class ListController : MonoBehaviour
             url = $"file://{texturePath}";
         }
         Debug.Log(url);
-        var downloadHandler =
-            (await UnityWebRequestTexture.GetTexture(url).SendWebRequest().WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler as DownloadHandlerTexture;
-        return downloadHandler.texture;
+        return (await DoGetAsync(UnityWebRequestTexture.GetTexture(url)) as DownloadHandlerTexture).texture;
+    }
+
+    private async UniTask<DownloadHandler> GetAsync(string url)
+    {
+        return await DoGetAsync(UnityWebRequest.Get(url));
+    }
+    
+    private async UniTask<DownloadHandler> DoGetAsync(UnityWebRequest request)
+    {
+        return (await request.SendWebRequest()
+            .WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler;
     }
 
 }
