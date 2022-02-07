@@ -1,10 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Linq;
 using System.Net.Sockets;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -22,8 +21,6 @@ public class ListController : MonoBehaviour
 
     private string dataDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-    private IDictionary<string, Metadata> pairs = new Dictionary<string, Metadata>();
-
     [SerializeField] private RectTransform content;
 
     [SerializeField] private GameObject iconPrefab;
@@ -33,48 +30,42 @@ public class ListController : MonoBehaviour
         Application.targetFrameRate = 24;
     }
     
-    void Start()
+    async void Start()
     {
-        StartCoroutine(PrepareList($"{baseUrl}mapping_v2.txt"));
+        var pairs = await DownloadList($"{baseUrl}mapping_v2.txt");
+        await PopulateTexture(pairs);
     }
 
-    IEnumerator PrepareList(string mappingPath)
+    async UniTask<IDictionary<string, Metadata>> DownloadList(string mappingPath)
     {
-        var request = new UnityWebRequest(mappingPath);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        yield return request.SendWebRequest();
-        if (request.result == UnityWebRequest.Result.Success)
+        var pairs = new Dictionary<string, Metadata>();
+        var mappingInfo = (await UnityWebRequest.Get(mappingPath).SendWebRequest()
+                .WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler.text;
+        foreach (var s in mappingInfo.Split('\n'))
         {
-            var textData = request.downloadHandler.text;
-            foreach (var s in textData.Split('\n'))
+            var keyValue = s.Split('=');
+            if (keyValue.Length < 2)
             {
-                var keyValue = s.Split('=');
-                if (keyValue.Length < 2)
-                {
-                    continue;
-                }
-                var key = keyValue[0];
-                var metadata = new Metadata
-                {
-                    dataName = keyValue[1],
-                    chunkCount =  keyValue.Length > 2 ? Int32.Parse(keyValue[2]) : 0
-                };
-                
-                pairs.Add(key, metadata);
+                continue;
             }
+            
+            // big data has been split.
+            var key = keyValue[0];
+            var metadata = new Metadata
+            {
+                dataName = keyValue[1],
+                chunkCount =  keyValue.Length > 2 ? Int32.Parse(keyValue[2]) : 0
+            };
+            
+            pairs.Add(key, metadata);
         }
-        else
-        {
-            Debug.LogError(request.error);
-        }
-
-        OnConfigPrepared();
+        return pairs;
     }
 
-    private void OnConfigPrepared()
+    private async UniTask PopulateTexture(IDictionary<string, Metadata> metadatas)
     {
         var client = new UdpClient();
-        foreach (var pair in pairs)
+        foreach (var metadata in metadatas)
         {
             var icon = Instantiate(iconPrefab);
             var iconTransform = icon.GetComponent<RectTransform>();
@@ -82,97 +73,100 @@ public class ListController : MonoBehaviour
             iconTransform.localPosition = Vector3.zero;
             iconTransform.localScale = Vector3.one;
             var button = icon.GetComponentInChildren<Button>();
-            StartCoroutine(LoadTexture(icon.GetComponent<RawImage>(), pair.Key, button));
-
-            var video = $"{dataDir}/{pair.Value.dataName}.mp4";
-            var chunkCount = pair.Value.chunkCount;
+            var video = $"{dataDir}/{metadata.Value.dataName}.mp4";
+       
             var text = button.GetComponentInChildren<Text>();
             text.text = File.Exists(video) ? "Select" : "Download";
-            button.onClick.AddListener(() =>
+            try
             {
-                if (File.Exists(video))
-                {
-                    var data = Encoding.UTF8.GetBytes($"dataPath:{video}");
-                    client.SendAsync(data, data.Length, "localhost", 9205);
-                }
-                else
-                {
-                    StartCoroutine(DownloadVideo($"{baseUrl}game/{pair.Value.dataName}.ndf", video,
-                        chunkCount, button, text));
-                }
-            });
+                icon.GetComponent<RawImage>().texture = await LoadTexture(metadata.Key);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                text.text = "Texture Error";
+            }
+
+            AddOnClickHandler(button,text, client, video,metadata); 
         }
     }
 
-    IEnumerator DownloadVideo(string url, string path, int chunkCount, Button button, Text text)
+    private async void AddOnClickHandler(Button button, Text text, UdpClient client, string video, KeyValuePair<string,Metadata> metadata)
     {
-        button.enabled = false;
-        Boolean hasError = false;
-        if (chunkCount > 0)
+        var chunkCount = metadata.Value.chunkCount;
+        while (!this.GetCancellationTokenOnDestroy().IsCancellationRequested)
         {
-            var data = Array.Empty<byte>().AsEnumerable();
-            for (var i = 1; i <= chunkCount; i++)
+            try
             {
-                text.text = $"Downloading... {i}/{chunkCount}";
-                var chunkURL = $"{url}_chunk{i}";
-                Debug.Log($"download from {chunkURL}");
-                var request = new UnityWebRequest(chunkURL);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                yield return request.SendWebRequest();
-                if (request.result == UnityWebRequest.Result.Success)
+                await button.OnClickAsync(this.GetCancellationTokenOnDestroy());
+                if (File.Exists(video))
                 {
-                   data  = data.Concat(request.downloadHandler.data);
+                    var data = Encoding.UTF8.GetBytes($"dataPath:{video}");
+                    await client.SendAsync(data, data.Length, "localhost", 9205);
                 }
                 else
                 {
-                    Debug.LogError($"download failed {request.error}");
-                    hasError = true;
-                    break;
+                    button.enabled = false;
+                    try
+                    {
+                        await DownloadVideo($"{baseUrl}game/{metadata.Value.dataName}.ndf", video,
+                            chunkCount, text);
+                        text.text = "Select";
+                    }
+                    catch (UnityWebRequestException e)
+                    {
+                        Debug.LogException(e);
+                        text.text = "Error";
+                    }
+
+                    button.enabled = true;
                 }
             }
-            if (!hasError)
+            catch (OperationCanceledException oce)
             {
-                //TODO async write
-                File.WriteAllBytes($"{path}_tmp", data.Skip(2).ToArray());
-                File.Move($"{path}_tmp", path);
-                Debug.Log($"saved into {path}");
+                //ignore console error
             }
+        }
+    }
+
+    private async UniTask DownloadVideo(string url, string path, int chunkCount, Text text)
+    {
+        if (chunkCount > 0)
+        {
+            using (var writer = File.OpenWrite($"{path}_tmp"))
+            {
+                for (var i = 1; i <= chunkCount; i++)
+                {
+                    text.text = $"Downloading... {i}/{chunkCount}";
+                    var chunkURL = $"{url}_chunk{i}";
+                    Debug.Log($"download from {chunkURL}");
+                    var data = (await UnityWebRequest.Get(chunkURL).SendWebRequest()
+                        .WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler.data;
+                    var offset = i == 1 ? 2 :0 ;
+                    await writer.WriteAsync(data, offset, data.Length - offset);
+                }
+            }
+            File.Move($"{path}_tmp", path);
+            Debug.Log($"saved into {path}");
         }
         else
         {
             text.text = "Downloading...";
             Debug.Log($"download from {url}");
-            var request = new UnityWebRequest(url);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            yield return request.SendWebRequest();
-            if (request.result == UnityWebRequest.Result.Success)
+            var data = (await UnityWebRequest.Get(url).SendWebRequest().WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler.data;
+            using (var writer = File.OpenWrite($"{path}_tmp"))
             {
-                var original = request.downloadHandler.data;
                 // I discovered that ndf is mp4 but first 2 bytes cause collapse. 
-                var mp4 = original.Skip(2).ToArray();
-                File.WriteAllBytes($"{path}_tmp", mp4);
-                File.Move($"{path}_tmp", path);
-                Debug.Log($"saved into {path}");
+                var offset = 2;
+                await writer.WriteAsync(data, offset, data.Length - offset) ;
             }
-            else
-            {
-                Debug.LogError($"download failed {request.error}");
-                hasError = true;
-            } 
-        }
 
-        if (hasError)
-        {
-            text.text = "Error";
-        }
-        else
-        {
-            button.enabled = true;
-            text.text = "Select";
+            File.Move($"{path}_tmp", path);
+            Debug.Log($"saved into {path}");
         }
     }
 
-    IEnumerator LoadTexture(RawImage image, string key, Button button)
+    private async UniTask<Texture> LoadTexture(string key)
     {
         var url = $"{baseUrl}game/{key}.ndf";
         var texturePath = $"{dataDir}/{key}.ndf";
@@ -181,11 +175,9 @@ public class ListController : MonoBehaviour
             url = $"file://{texturePath}";
         }
         Debug.Log(url);
-        button.enabled = false;
-        var request = UnityWebRequestTexture.GetTexture(url);
-        yield return request.SendWebRequest();
-        image.texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-        button.enabled = true;
+        var downloadHandler =
+            (await UnityWebRequestTexture.GetTexture(url).SendWebRequest().WithCancellation(this.GetCancellationTokenOnDestroy())).downloadHandler as DownloadHandlerTexture;
+        return downloadHandler.texture;
     }
 
 }
