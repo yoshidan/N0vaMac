@@ -10,13 +10,18 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 * 音声は再生しません。
 
 ## 動作環境
+
+### Intel 
 * MacBookPro Intel macOS Catalina 10.15
 * MacBookPro Intel macOS Mojave 10.14
-
-M1 Macは当方未所持のため未検証です。
+* MacBookPro Apple M1 Pro macOS Monterey 12.2
 
 ## ダウンロード
-[こちらから](https://github.com/yoshidan/N0vaMac/releases)最新版のN0vaMac.zipをダウンロードして開いてください。解凍すると以下の二つのアプリがあります。
+* Intel版 -> [こちらから](https://github.com/yoshidan/N0vaMac/releases)最新版のN0vaMac.zipをダウンロードして開いてください。
+* M1版 -> [こちらから](https://github.com/yoshidan/N0vaMac/releases)最新版のN0vaMac_M1.zipをダウンロードして開いてください。
+  
+解凍すると以下の二つのアプリがあります。
+  
 * N0vaMac
   - 動画を壁紙にするツールです。
 * N0vaMacConfig 
