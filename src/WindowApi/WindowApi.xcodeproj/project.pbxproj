@@ -132,7 +132,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncp -r ${TARGET_BUILD_DIR}/libWindowApi.dylib ${PROJECT_DIR}/../wallpaper/Assets/Plugins/WindowApi/macOS\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncp -r ${TARGET_BUILD_DIR}/libWindowApi.dylib ${PROJECT_DIR}/../N0vaMac/Assets/Plugins/WindowApi/macOS\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
