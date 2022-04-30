@@ -18,13 +18,11 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 
 ## ダウンロード
 * [こちらから](https://github.com/yoshidan/N0vaMac/releases)最新版の以下のファイルをダウンロードしてください。
- - N0vaMac.zip
- - N0vaMacConfig.zip
-   
-* N0vaMac
-  - 動画を壁紙にするツールです。
-* N0vaMacConfig 
-  - N0vaDesktopのライブ壁紙をダウンロードしたり壁紙を変更するためのツールです。
+  - N0vaMac.zip  
+    動画を壁紙にするツールです。
+  
+  - N0vaMacConfig.zip  
+    N0vaDesktopのライブ壁紙をダウンロードしたり壁紙を変更するためのツールです。
 
 ## N0vaMacの使い方
 * N0vaMacを起動してください。デフォルトで背景に動く胡桃が画面全体の背景に表示されればOKです。
