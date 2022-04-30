@@ -14,7 +14,6 @@ void background() {
     NSWindow *window = [NSApp orderedWindows][0];
     window.collectionBehavior = NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorFullScreenAuxiliary;
     window.level = kCGDesktopWindowLevel - 1;
-    [window setFrameOrigin:NSMakePoint(0,0)];
 }
 
 void hideTitleBar() {
