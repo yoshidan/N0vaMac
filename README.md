@@ -6,7 +6,7 @@ https://user-images.githubusercontent.com/958174/151774363-44f1ddfd-2279-442c-9c
 
 ## できること
 * WindowsとAndroidしかサポートしていない[N0va Desktop](https://n0vadp.mihoyo.com/)の一部ライブ背景をMacのデスクトップ背景として使えるようにします。
-* 現在利用できるのは原神の一部ライブ壁紙です。Lumi、他のゲームは対応していません。
+* 現在利用できるのは原神の一部ライブ壁紙です。Lumiは対応していません。
 * 音声は再生しません。
 
 ## 動作環境
