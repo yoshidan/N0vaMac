@@ -1,3 +1,4 @@
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,8 +14,9 @@ public class VideoController : MonoBehaviour
     private float aspectRatio = 1.0f;
     private VideoAspectRatio videoAspectRatio;
 
-    [SerializeField]
-    private VideoClip defaultClip;
+  //  [SerializeField] private Text debugInfo;
+
+    [SerializeField] private VideoClip defaultClip;
     
     void Awake()
     {
@@ -25,13 +27,14 @@ public class VideoController : MonoBehaviour
         player.prepareCompleted += (source) =>
         {
             var texture = source.texture;
-            aspectRatio = (float)texture.height / texture.width;
+            aspectRatio = (float) texture.height / texture.width;
         };
         videoAspectRatio = player.aspectRatio;
     }
 
     private void Start()
     {
+
         var settingFile = $"{Application.persistentDataPath}/path.txt";
         if (File.Exists(settingFile))
         {
@@ -56,6 +59,7 @@ public class VideoController : MonoBehaviour
         WindowApi.Background();
         WindowApi.HideTitleBar();
 #endif
+        StartCoroutine(AdjustLoop());
     }
 
     public void ChangeUrl(string url)
@@ -65,7 +69,7 @@ public class VideoController : MonoBehaviour
         player.url = $"file://{url}";
         player.Play();
     }
-    
+
     public void ChangeClip(VideoClip clip)
     {
         player.Stop();
@@ -74,16 +78,30 @@ public class VideoController : MonoBehaviour
         player.Play();
     }
 
+    private IEnumerator AdjustLoop()
+    {
+        while (true)
+        {
+            yield return Adjust();
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    private IEnumerator Adjust()
+    {
+        var resolution = Screen.currentResolution;
+        Screen.SetResolution(resolution.width, resolution.height, false); 
+        var currentMonitor = Screen.mainWindowDisplayInfo;
+        //always move to origin in current monitor
+        yield return Screen.MoveMainWindowTo(currentMonitor, currentMonitor.workArea.min);
+    }
+
     void Update()
     {
         if (player.isPrepared)
         {
             image.texture = player.texture;
-#if !UNITY_EDITOR
-            var resolution = Screen.currentResolution;
-            Screen.SetResolution(resolution.width, resolution.height, false); 
-            WindowApi.InitializePosition();
-#endif
+            
             switch(videoAspectRatio)
             {
                 case VideoAspectRatio.FitHorizontally:

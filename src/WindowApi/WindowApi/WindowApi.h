@@ -18,6 +18,8 @@ void hideTitleBar(void);
 
 void initializePosition(void);
 
+void maximize(void);
+
 #ifdef __cplusplus
 }
 #endif

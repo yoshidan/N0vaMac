@@ -28,3 +28,8 @@ void initializePosition() {
     NSWindow *window = [NSApp orderedWindows][0];
     [window setFrameOrigin:NSMakePoint(0,0)];
 }
+
+void maximize() {
+    NSWindow *window = [NSApp orderedWindows][0];
+    [window zoom:(NULL)];
+}

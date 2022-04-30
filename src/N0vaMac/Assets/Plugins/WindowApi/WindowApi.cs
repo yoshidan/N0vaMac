@@ -12,7 +12,9 @@ public class WindowApi
     
     [DllImport(Target)]
     private static extern void initializePosition();
-
+    
+    [DllImport(Target)]
+    private static extern void maximize();
 
     public static void Background()
     {
@@ -27,6 +29,11 @@ public class WindowApi
     public static void InitializePosition()
     {
         initializePosition();
+    }
+    
+    public static void Maximize()
+    {
+        maximize();
     }
 
 }
