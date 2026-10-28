@@ -1,3 +1,7 @@
+2026.10.28 N0vaMacは提供終了です。代わりに以下のツールを使ってください。  
+https://github.com/yoshidan/LiveDesk
+
+
 # N0vaMac
 Desktop Live Wallpaper tool for macOS 
 
